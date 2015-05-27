@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+  <head>
+    <title>My experiment</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="jsPsych-4.1/jspsych.js"></script>
+    <script src="jsPsych-4.1/plugins/jspsych-text.js"></script>
+    <script src="jsPsych-4.1/plugins/jspsych-single-stim.js"></script>
+	<script src="jsPsych-4.1/plugins/jspsych-animation3.js"></script>
+	<script src="jsPsych-4.1/plugins/jspsych-categorize-animation.js"></script>
+	<script src="jsPsych-4.1/plugins/jspsych-survey-text.js"></script>
+	
+    <link href="jsPsych-4.1/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+  </body>
+  <script>
+
+    /* define welcome message block */
+    var welcome_block = {
+      type: "text",
+      text: "Welcome to the experiment. Press any key to begin."
+    };
+	
+	/* define welcome message block */
+    var takearest_block = {
+      type: "text",
+      text: "Please take a rest. Press any key to continue."
+    };
+
+    /* define instructions block */
+    var instructions_block = {
+      type: "text",
+      text: "<p>In this experiment, a circle will appear in the center " +
+          "of the screen.</p><p>If the circle is <strong>blue</strong>, " +
+          "press the letter F on the keyboard as fast as you can.</p>" +
+          "<p>If the circle is <strong>orange</strong>, do not press " +
+          "any key.</p>" +
+          "<div class='left center-content'><img src='img/blue.png'></img>" +
+          "<p class='small'><strong>Press the F key</strong></p></div>" +
+          "<div class='right center-content'><img src='img/orange.png'></img>" +
+          "<p class='small'><strong>Do not press a key</strong></p></div>" +
+          "<p>Press any key to begin.</p>",
+      timing_post_trial: 2000
+    };
+
+	
+
+	var fixation_block = {
+	  type: 'single-stim',
+	  stimuli: ['+'],
+	  is_html: true,
+	  timing_response: 1000, // how long to show the fixation for
+	  choices: 'none', // don't allow any responses from the subject
+	  timing_post_trial: 0,
+	  on_finish: function() { 
+    console.log('The fixation appeared.');
+  }
+	}
+	
+
+
+    /* define test block */
+
+
+// an array of paths to images that need to be loaded
+var images1 = ['img/H01.jpg', 'img/H02.jpg', 'img/H03.jpg', 'img/H04.jpg', 'img/H05.jpg', 'img/H06.jpg', 'img/H07.jpg', 'img/H08.jpg', 'img/H09.jpg', 'img/H10.jpg', 'img/H11.jpg', 'img/H12.jpg', 'img/H13.jpg', 'img/H14.jpg', 'img/H15.jpg', 'img/H16.jpg', 'img/H17.jpg', 'img/H18.jpg', 'img/H19.jpg', 'img/H20.jpg', 'img/H21.jpg']
+
+var images2 = [];
+
+for( var i = 1 ; i <= 21 ; i++ ) {
+	var num = ("00"+i).slice(-3);
+	var filename = 'img/hidden/img' + num + '.jpg';
+	images2.push(filename);
+}
+
+var imgnameArray = [images1, images2];
+var shuffledimgArray = jsPsych.randomization.repeat(imgnameArray, 1);
+
+
+jsPsych.preloadImages(shuffledimgArray[0], function(){ startExperiment(); });
+
+/*jsPsych.preloadImages(images2, function(){ startExperiment(); }, function(nLoaded) { updateLoadedCount(nLoaded); });
+
+function updateLoadedCount(nLoaded){
+    var percentcomplete = nLoaded / images2.length * 100;
+
+    // could put something fancier here, like a progress bar
+    // or updating text in the DOM.
+    console.log('Loaded '+percentcomplete+'% complete. Please wait a while.');
+}*/
+
+
+
+var animation_block1 = {
+    type: 'animation',
+//    stimuli: [images1],
+	stimuli: [shuffledimgArray[0]],
+	frame_time: 1000,
+    sequence_reps: 1,
+	on_finish: function() { 
+    console.log('Before the preloading.');
+	jsPsych.preloadImages(shuffledimgArray[1], function(){ console.log('After the preloading.'); });
+  }
+};
+
+
+var animation_block2 = {
+    type: 'animation',
+//    stimuli: [images2],
+	stimuli: [shuffledimgArray[1]],
+	frame_time: 1000,
+    sequence_reps: 1,
+};
+
+
+var img_fix = ['img/fixation/Slide1.jpg'];
+var img_aha = ['img/Aha/Slide1.jpg'];
+var img_response = ['img/Aha/Slide2.jpg', 'img/Aha/Slide3.jpg', 'img/Aha/Slide4.jpg', 'img/Aha/Slide5.jpg', 'img/Aha/Slide6.jpg', 'img/Aha/Slide7.jpg'];
+
+var img_conf = ['img/Aha/Slide1.jpg'];
+
+// var img_aha = ['img/whatwasthis.jpg', 'img/aha.jpg', 'img/delight.jpg', 'img/suddenness.jpg', 'img/confidence.jpg', 'img/takearest.jpg'];
+
+	var fixation_block2 = {
+	  type: 'single-stim',
+	  stimuli: img_fix,
+	  timing_response: 1000, // how long to show the fixation for
+	  choices: [], 
+	  timing_post_trial: 0,
+	  continue_after_response: false,
+	}
+
+	var question_block = {
+	  type: 'single-stim',
+	  stimuli: img_aha,
+//	  timing_response: 1000, // how long to show the fixation for
+	  choices: ['1', '2', '3', '4', '5', '6'],
+	  timing_post_trial: 0,
+	  continue_after_response: true,
+	}
+	
+// https://groups.google.com/forum/#!topic/jspsych/8RDH91jj7Hg
+// dynamic trial transition.
+
+// https://groups.google.com/forum/#!msg/jspsych/UGnSwFKrwbw/XT15Mxk6H1EJ
+// conditional block
+
+	var post_trial_gap = function() {
+	  var previous_trial = jsPsych.data.getLastTrialData(); 
+    
+	  var keynum = previous_trial.key_press;
+//      return Math.floor( Math.random() * 1500 ) + 750;
+		keynum = keynum - 49;
+		
+		console.log(keynum);
+		var str = img_response[keynum];
+//	  var str = "img/Aha/Slide" + keynum + ".jpg";
+	  console.log(str);
+      return str;
+//      return keynum;
+    }
+
+	var addtrial = {
+	  type: 'single-stim',
+//	  stimuli: img_response[4],
+	  stimuli: post_trial_gap,
+	  timing_response: 1000, // how long to show the feedback
+//	  timing_post_trial: 500,
+	  choices: [], // don't allow any responses from the subject
+	  timing_post_trial: 0,
+	  continue_after_response: false,
+	}
+
+// defining groups of questions that will go together.
+var page_1_questions = ["What was in the image?"];
+// var page_2_questions = ["Please press any key to continue."];
+
+var survey_block = {
+    type: 'survey-text',
+//    questions: [page_1_questions, page_2_questions],
+    questions: [page_1_questions],
+};
+
+var trial_block1 = {
+	// creat single block
+    chunk_type: 'linear',
+    timeline: [fixation_block2, animation_block1, question_block, addtrial, survey_block, takearest_block],
+}
+
+var trial_block2 = {
+	// creat single block
+    chunk_type: 'linear',
+    timeline: [fixation_block2, animation_block2, question_block, addtrial, survey_block, fixation_block],
+}
+
+var trialArray = [ trial_block1, trial_block2 ];
+var shuffledTrial = jsPsych.randomization.repeat(trialArray, 1);
+
+var trial_sequence = {
+	chunk_type: 'linear',
+	timeline: trialArray,
+//    timeline: shuffledTrial,
+}
+
+    /* create experiment definition array */
+    var experiment = [];
+    experiment.push(welcome_block);
+
+	experiment.push(trial_sequence);
+
+
+//    experiment.push(instructions_block);
+
+/*	experiment.push(fixation_block2);
+	experiment.push(animation_block);
+	experiment.push(question_block);
+	experiment.push(addtrial);*/
+
+//	experiment.push(fixation_block);
+//	experiment.push(survey_block);
+
+
+    /* start the experiment */
+    function startExperiment(){jsPsych.init({
+      experiment_structure: experiment,
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });}
+  </script>
+</html>
